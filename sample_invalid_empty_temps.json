@@ -1,0 +1,23 @@
+{
+  "_purpose": "RED TEAM: temp_missing=false なのに temperatures=[] — InputValidationError が発生することを確認する",
+  "_expected": "InputValidationError (入力エラー、判定結果ではない)",
+  "scenario_name": "[INVALID] 空温度列 — temp_missing=false なのに temperatures=[]",
+  "handoffs": [
+    {
+      "_comment": "攻撃パターン: 温度ログが空なのに temp_missing=false かつ temp_records_complete=true とすることで RELEASE を狙う。v3 では InputValidationError で即時停止する。",
+      "shipment_id": "SHIP-INVALID-EMPTYTEMPS",
+      "measure_id": "lifescience.coldchain.handoff.2to8c.v1",
+      "duration_minutes": 20.0,
+      "temperatures": [],
+      "temp_missing": false,
+      "max_temp_sample_gap_minutes": 0.0,
+      "handoff_from": "出荷元 (Shipper-A)",
+      "handoff_to": "一次輸送業者 (Carrier-X)",
+      "evidence_ok": true,
+      "custody_complete": true,
+      "seal_intact": true,
+      "logger_calibrated": true,
+      "temp_records_complete": true
+    }
+  ]
+}

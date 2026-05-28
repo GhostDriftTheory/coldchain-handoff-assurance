@@ -1,0 +1,44 @@
+{
+  "scenario_name": "β超過ケース — 致命的逸脱 REJECT（d_plus=3.5 > beta=2.0）",
+  "handoffs": [
+    {
+      "_comment": "PoC / test only — dummy data. d_plus = 11.5 - 8.0 = 3.5 > beta(2.0). Expected: REJECT.",
+      "shipment_id": "SHIP-BETA-REJECT-001",
+      "measure_id": "lifescience.coldchain.handoff.2to8c.v1",
+      "duration_minutes": 20.0,
+      "temperatures": [
+        [
+          0,
+          5.0
+        ],
+        [
+          5,
+          7.5
+        ],
+        [
+          10,
+          11.5
+        ],
+        [
+          15,
+          8.5
+        ],
+        [
+          20,
+          5.0
+        ]
+      ],
+      "temp_missing": false,
+      "max_temp_sample_gap_minutes": 5.0,
+      "handoff_from": "出荷元 (Shipper-A)",
+      "handoff_to": "一次輸送業者 (Carrier-X)",
+      "pallet_id": "PLT-BETA001",
+      "logger_id": "LOG-BETA001",
+      "evidence_ok": true,
+      "custody_complete": true,
+      "seal_intact": true,
+      "logger_calibrated": true,
+      "temp_records_complete": true
+    }
+  ]
+}

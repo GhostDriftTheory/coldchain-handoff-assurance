@@ -1,0 +1,36 @@
+{
+  "_purpose": "RED TEAM: タイムスタンプ逆順 — 旧実装では sorted() で黙って並べ替えていたが、v3 では InputValidationError で停止する",
+  "_expected": "InputValidationError (入力エラー、判定結果ではない)",
+  "scenario_name": "[INVALID] タイムスタンプ逆順 — 入力改ざんテスト",
+  "handoffs": [
+    {
+      "_comment": "攻撃パターン: タイムスタンプを意図的に逆順にすることで積分計算を混乱させようとする。また重複タイムスタンプ (t=5 が2回) も含んでいる。v3 では両方とも InputValidationError で停止する。",
+      "shipment_id": "SHIP-INVALID-TIMESTAMPS",
+      "measure_id": "lifescience.coldchain.handoff.2to8c.v1",
+      "duration_minutes": 20.0,
+      "temperatures": [
+        [
+          10,
+          5.0
+        ],
+        [
+          0,
+          5.1
+        ],
+        [
+          20,
+          5.2
+        ]
+      ],
+      "temp_missing": false,
+      "max_temp_sample_gap_minutes": 10.0,
+      "handoff_from": "出荷元 (Shipper-A)",
+      "handoff_to": "一次輸送業者 (Carrier-X)",
+      "evidence_ok": true,
+      "custody_complete": true,
+      "seal_intact": true,
+      "logger_calibrated": true,
+      "temp_records_complete": true
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "scenario_name": "chain停止デモ — 区間2のHOLDで後続評価を停止（--stop-on-fail デフォルト動作）",
+  "handoffs": [
+    {
+      "_comment": "PoC / test only — dummy data. Leg 1: normal RELEASE.",
+      "shipment_id": "SHIP-CHAINSTOP-001",
+      "measure_id": "lifescience.coldchain.handoff.2to8c.v1",
+      "duration_minutes": 18.0,
+      "temperatures": [
+        [
+          0,
+          4.8
+        ],
+        [
+          5,
+          5.0
+        ],
+        [
+          10,
+          5.1
+        ],
+        [
+          15,
+          5.0
+        ],
+        [
+          18,
+          4.9
+        ]
+      ],
+      "temp_missing": false,
+      "max_temp_sample_gap_minutes": 5.0,
+      "handoff_from": "出荷元 (Shipper-A)",
+      "handoff_to": "一次輸送業者 (Carrier-X)",
+      "pallet_id": "PLT-CS001",
+      "logger_id": "LOG-CS001",
+      "evidence_ok": true,
+      "custody_complete": true,
+      "seal_intact": true,
+      "logger_calibrated": true,
+      "temp_records_complete": true
+    },
+    {
+      "_comment": "PoC / test only — dummy data. Leg 2: HOLD — seal broken on arrival. With --stop-on-fail (default), evaluation stops here. Leg 3 is NOT evaluated.",
+      "shipment_id": "SHIP-CHAINSTOP-001",
+      "measure_id": "lifescience.coldchain.handoff.2to8c.v1",
+      "duration_minutes": 25.0,
+      "temperatures": [
+        [
+          0,
+          5.0
+        ],
+        [
+          8,
+          5.2
+        ],
+        [
+          16,
+          5.1
+        ],
+        [
+          24,
+          5.0
+        ]
+      ],
+      "temp_missing": false,
+      "max_temp_sample_gap_minutes": 8.0,
+      "handoff_from": "一次輸送業者 (Carrier-X)",
+      "handoff_to": "中継拠点 (Hub-B)",
+      "pallet_id": "PLT-CS001",
+      "logger_id": "LOG-CS002",
+      "evidence_ok": true,
+      "custody_complete": true,
+      "seal_intact": false,
+      "logger_calibrated": true,
+      "temp_records_complete": true
+    },
+    {
+      "_comment": "PoC / test only — dummy data. Leg 3: would be RELEASE, but with --stop-on-fail this leg is NOT evaluated because leg 2 was HOLD. Use --continue-after-fail to see this leg.",
+      "shipment_id": "SHIP-CHAINSTOP-001",
+      "measure_id": "lifescience.coldchain.handoff.2to8c.v1",
+      "duration_minutes": 20.0,
+      "temperatures": [
+        [
+          0,
+          5.0
+        ],
+        [
+          10,
+          5.2
+        ],
+        [
+          20,
+          5.1
+        ]
+      ],
+      "temp_missing": false,
+      "max_temp_sample_gap_minutes": 10.0,
+      "handoff_from": "中継拠点 (Hub-B)",
+      "handoff_to": "納品先 (Hospital-C)",
+      "pallet_id": "PLT-CS001",
+      "logger_id": "LOG-CS003",
+      "evidence_ok": true,
+      "custody_complete": true,
+      "seal_intact": true,
+      "logger_calibrated": true,
+      "temp_records_complete": true
+    }
+  ]
+}

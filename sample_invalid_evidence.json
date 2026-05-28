@@ -1,0 +1,36 @@
+{
+  "_purpose": "RED TEAM: 証拠矛盾テスト — evidence_ok=false だが全個別フラグが true。v3 では stderr に警告を出したうえで HOLD として判定する（InputValidationError にはならない）",
+  "_expected": "stderr 警告 + HOLD 判定 (バイパス不可)",
+  "scenario_name": "[WARN→HOLD] 証拠矛盾 — evidence_ok=false かつ全サブフラグ true",
+  "handoffs": [
+    {
+      "_comment": "攻撃パターン: evidence_ok=false に見せかけながら、すべての個別フラグを true にすることで HOLD を RELEASE に変えようとする。v3 では矛盾を検出して警告し、evidence_ok=false が最優先で HOLD に落とす。",
+      "shipment_id": "SHIP-WARN-EVCONFLICT",
+      "measure_id": "lifescience.coldchain.handoff.2to8c.v1",
+      "duration_minutes": 20.0,
+      "temperatures": [
+        [
+          0,
+          5.0
+        ],
+        [
+          10,
+          5.1
+        ],
+        [
+          20,
+          5.0
+        ]
+      ],
+      "temp_missing": false,
+      "max_temp_sample_gap_minutes": 10.0,
+      "handoff_from": "出荷元 (Shipper-A)",
+      "handoff_to": "一次輸送業者 (Carrier-X)",
+      "evidence_ok": false,
+      "custody_complete": true,
+      "seal_intact": true,
+      "logger_calibrated": true,
+      "temp_records_complete": true
+    }
+  ]
+}

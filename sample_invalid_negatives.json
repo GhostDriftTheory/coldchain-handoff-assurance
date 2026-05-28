@@ -1,0 +1,36 @@
+{
+  "_purpose": "RED TEAM: duration_minutes=-10 — 負値は InputValidationError で停止することを確認する",
+  "_expected": "InputValidationError (入力エラー、判定結果ではない)",
+  "scenario_name": "[INVALID] 負の duration_minutes — 不正値入力テスト",
+  "handoffs": [
+    {
+      "_comment": "攻撃パターン: duration_minutes を負値にすることで閾値チェックを回避しようとする試み。v3 では InputValidationError で即時停止する。max_temp_sample_gap_minutes も負値 (-5) を入れているが、duration 検査が先に走るため先にそちらで止まる。",
+      "shipment_id": "SHIP-INVALID-NEGDUR",
+      "measure_id": "lifescience.coldchain.handoff.2to8c.v1",
+      "duration_minutes": -10.0,
+      "temperatures": [
+        [
+          0,
+          5.0
+        ],
+        [
+          5,
+          5.1
+        ],
+        [
+          10,
+          5.0
+        ]
+      ],
+      "temp_missing": false,
+      "max_temp_sample_gap_minutes": -5.0,
+      "handoff_from": "出荷元 (Shipper-A)",
+      "handoff_to": "一次輸送業者 (Carrier-X)",
+      "evidence_ok": true,
+      "custody_complete": true,
+      "seal_intact": true,
+      "logger_calibrated": true,
+      "temp_records_complete": true
+    }
+  ]
+}
