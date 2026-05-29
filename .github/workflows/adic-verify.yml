@@ -1,0 +1,17 @@
+name: ADIC PoC Phase 1 Verification
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python ADIC_POC_PHASE1_CERTIFICATE.py
+      - run: pip install pytest
+      - run: pytest test_poc_handoff_pde.py -v
