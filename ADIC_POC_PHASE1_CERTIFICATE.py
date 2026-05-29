@@ -23,36 +23,38 @@ CERTIFICATE_ID = "ADIC-COLDCHAIN-POC-PHASE1-SINGLEFILE-001"
 SYSTEM_ID = "coldchain-handoff-assurance-poc"
 
 # ADIC target files. This is the certificate scope. Nothing else is certified.
+# size_bytes and sha256 are computed over repository text bytes with CRLF
+# normalized to LF, matching GitHub Actions checkout semantics.
 ADIC_TARGET_FILES = [
     {
         "path": "poc_handoff_pde.py",
         "role": "judgement_logic",
-        "sha256": "8477a515eddee532bfffa2bacb7b73862252c5ac9bd5d6b979b5fbe9e7ae03b9",
-        "size_bytes": 40974,
+        "sha256": "dc16ec71654ea12da79b15c52b3d4a8c33abaddf186825382f769354d7e8532d",
+        "size_bytes": 39940,
     },
     {
         "path": "sample_beta_breach_reject.json",
         "role": "replay_input_reject",
-        "sha256": "50bd7627e2cc38e726f419ada7bce3b02f3e0654e4fa1593fab706bceefa1e4e",
-        "size_bytes": 1092,
+        "sha256": "9773e8a605217ec9c2bda7adba4112734cd85124121bf43277ad9cfd93951fd8",
+        "size_bytes": 1049,
     },
     {
         "path": "sample_chain_stop_demo.json",
         "role": "replay_input_chain_stop",
-        "sha256": "fec016a13a979f820ff292349d432e6d806c2eabbb3f901d7f02c8e2485350f6",
-        "size_bytes": 2992,
+        "sha256": "832e51d19db91dc38b34ef8c9283b32ed46aeaac1b409556e5b281e3a87c66a8",
+        "size_bytes": 2883,
     },
     {
         "path": "test_poc_handoff_pde.py",
         "role": "test_evidence",
-        "sha256": "cfd6ee47e1bc9c0d2bae33a47ac635fc5befd051486d0ad424bf0b6872df2813",
-        "size_bytes": 40199,
+        "sha256": "c519229539c781b9c78639428671386931b034a121289ff12777f7e7f6b59ccc",
+        "size_bytes": 39240,
     },
     {
         "path": "SECURITY_DESIGN.md",
         "role": "security_scope",
-        "sha256": "d303bc6dfb9210fc27774ac93b4df7b44a3d36c3305a61d56752efd2b1a146c2",
-        "size_bytes": 8409,
+        "sha256": "2293a521c3edef60f98081751c4e4e980c48c89186ea1b54a9c97f09c9154d14",
+        "size_bytes": 8245,
     },
 ]
 
@@ -162,8 +164,12 @@ def digest_obj(obj: Any) -> str:
     return sha256(canonical_json(obj).encode("utf-8")).hexdigest()
 
 
+def certified_file_bytes(path: Path) -> bytes:
+    return path.read_bytes().replace(b"\r\n", b"\n")
+
+
 def file_sha256(path: Path) -> str:
-    return sha256(path.read_bytes()).hexdigest()
+    return sha256(certified_file_bytes(path)).hexdigest()
 
 
 def load_poc(project_dir: Path):
@@ -186,7 +192,7 @@ def verify_artifacts(project_dir: Path) -> None:
         path = project_dir / artifact["path"]
         if not path.exists():
             raise AssertionError(f"missing target file: {artifact['path']}")
-        actual_size = path.stat().st_size
+        actual_size = len(certified_file_bytes(path))
         if actual_size != artifact["size_bytes"]:
             raise AssertionError(
                 f"size mismatch for {artifact['path']}: "
