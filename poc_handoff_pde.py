@@ -14,11 +14,11 @@ The chain halts at the first non-RELEASE leg by default (--stop-on-fail).
 
 Usage
 -----
-  python poc_handoff_pde.py                        # built-in 3-scenario demo
-  python poc_handoff_pde.py sample_beta_breach_reject.json
-  python poc_handoff_pde.py --chain sample_chain_stop_demo.json
-  python poc_handoff_pde.py --chain sample_chain_stop_demo.json --continue-after-fail
-  python poc_handoff_pde.py --chain sample_chain_stop_demo.json --write-summary
+  python poc_handoff_pde.py                                     # built-in 3-scenario demo
+  python poc_handoff_pde.py samples/sample_beta_breach_reject.json
+  python poc_handoff_pde.py --chain samples/sample_chain_stop_demo.json
+  python poc_handoff_pde.py --chain samples/sample_chain_stop_demo.json --continue-after-fail
+  python poc_handoff_pde.py --chain samples/sample_chain_stop_demo.json --write-summary
 
 Note
 ----
@@ -92,7 +92,7 @@ def _strict_finite(val: object, field: str, sid: str) -> float:
 def validate_handoff_input(h: dict) -> None:  # noqa: C901
     """Validate one handoff dict before parsing.
 
-    Raises InputValidationError when the input is malformed. See SECURITY_DESIGN.md
+    Raises InputValidationError when the input is malformed. See docs/SECURITY_DESIGN.md
     for the full list of conditions checked.
 
     Emits a stderr WARNING (does not raise) when evidence_ok=false but all
@@ -257,7 +257,7 @@ class EvidenceStatus:
 
     Note: receiver authentication is tracked in the input schema for forward
     compatibility but is not evaluated in this PoC's disposition logic.
-    See UPGRADE_TO_REAL_DATA.md §Future Extensions.
+    See docs/UPGRADE_TO_REAL_DATA.md §Future Extensions.
     """
     ok: bool; custody_complete: bool; seal_intact: bool
     logger_calibrated: bool; temp_records_complete: bool
@@ -318,7 +318,7 @@ def _exceeds(observed: float, threshold: float) -> bool:
     IEEE-754 note: beta thresholds (2.0, 30.0, 90.0°C) are exactly representable
     and comparisons are stable. Alpha thresholds (0.3°C) may interact with sensor
     rounding near the boundary. Production deployments should apply appropriate
-    measurement margins. See SECURITY_DESIGN.md §Known Boundaries.
+    measurement margins. See docs/SECURITY_DESIGN.md §Known Boundaries.
     """
     return observed > threshold
 
@@ -929,17 +929,17 @@ Examples
   python poc_handoff_pde.py
       Run built-in 3-scenario demo (no JSON file needed).
 
-  python poc_handoff_pde.py sample_beta_breach_reject.json
+  python poc_handoff_pde.py samples/sample_beta_breach_reject.json
       Evaluate a single scenario from a JSON file.
 
-  python poc_handoff_pde.py --chain sample_chain_stop_demo.json
+  python poc_handoff_pde.py --chain samples/sample_chain_stop_demo.json
       Evaluate a multi-leg chain; stop at first non-RELEASE (default).
 
-  python poc_handoff_pde.py --chain sample_chain_stop_demo.json --continue-after-fail
+  python poc_handoff_pde.py --chain samples/sample_chain_stop_demo.json --continue-after-fail
       Evaluate all legs regardless of intermediate failures.
 
-  python poc_handoff_pde.py --chain sample_chain_stop_demo.json --write-summary
-      Write a Markdown summary to summary.md.
+  python poc_handoff_pde.py --chain samples/sample_chain_stop_demo.json --write-summary
+      Write a Markdown summary to docs/summary.md.
 
 Chain stop behaviour
 --------------------
@@ -954,7 +954,7 @@ Chain stop behaviour
     ap.add_argument("--chain", metavar="FILE",
                     help="path to a multi-leg chain JSON file")
     ap.add_argument("--write-summary", action="store_true",
-                    help="write Markdown summary to summary.md")
+                    help="write Markdown summary to docs/summary.md")
     ap.add_argument("--charter", default="CHARTER-LS-2TO8-POC-001",
                     help="charter identifier (default: CHARTER-LS-2TO8-POC-001)")
 
@@ -995,8 +995,8 @@ Chain stop behaviour
         name, results, stopped_early, total_legs = all_res[0]
         md = build_summary_md(results, scenario_name=name,
                               stopped_early=stopped_early, total_legs=total_legs)
-        Path("summary.md").write_text(md, encoding="utf-8")
-        print("  → summary.md written.")
+        Path("docs/summary.md").write_text(md, encoding="utf-8")
+        print("  → docs/summary.md written.")
 
 
 if __name__ == "__main__":
