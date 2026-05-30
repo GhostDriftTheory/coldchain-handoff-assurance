@@ -47,8 +47,8 @@ ADIC_TARGET_FILES = [
     {
         "path": "test_poc_handoff_pde.py",
         "role": "test_evidence",
-        "sha256": "c519229539c781b9c78639428671386931b034a121289ff12777f7e7f6b59ccc",
-        "size_bytes": 39240,
+        "sha256": "8e945407b92da2f46f815cfc1f3d7f2ce82aa8f53d728854a3c55f5e806c4532",
+        "size_bytes": 39288,
     },
     {
         "path": "docs/SECURITY_DESIGN.md",
