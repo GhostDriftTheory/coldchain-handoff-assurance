@@ -1,129 +1,151 @@
-# Cold-Chain Handoff Quality Judgement — PoC
+# コールドチェーン 引き渡し品質判定 PoC
 
-> **This is a proof-of-concept using synthetic data.**  
-> It demonstrates the judgement logic only. Not a regulatory claim.  
-> Validate thresholds per-product and per-lane before any production use.
-
----
-
-## What this PoC shows
-
-Each time a medical product changes hands in a cold chain (shipper → carrier → hub → hospital),
-this PoC evaluates that handoff and produces one of four verdicts:
-
-| Verdict | Meaning | Action |
-|---------|---------|--------|
-| ✅ **RELEASE** | Evidence complete; all metrics within profile | Proceed to next leg |
-| 🟡 **HOLD** | Evidence gap (missing records / broken seal) | Isolate; investigate |
-| 🟠 **QA_REVIEW** | Temperature excursion in the gray zone (alpha < metric ≤ beta) | QA review before proceeding |
-| 🔴 **REJECT** | Fatal breach — metric exceeds beta threshold | Discard; do not distribute |
-
-When a non-RELEASE verdict occurs, **the chain stops by default** — downstream legs are not
-evaluated because their integrity cannot be assumed. The investigation anchor
-(last good leg / first failed leg) is displayed immediately.
-
-Three things are shown:
-1. **止める** (Stop) — halt the chain at the first issue
-2. **残す** (Preserve) — record the full judgement with a fixed ruleset digest
-3. **辿る** (Trace) — identify exactly where the chain broke
+> ⚠️ **サンプルデータによる概念実証です。規制上の根拠にはなりません。**
+> 本番環境での使用前に、閾値を製品・輸送ルートごとに別途検証してください。
 
 ---
 
-## Quick start
+## これは何をするシステムか
 
-Python 3.8+. No external libraries required.
+医薬品がコールドチェーン内で受け渡されるたびに（出荷元 → 輸送業者 → 中継拠点 → 病院）、
+「この荷物を次に進めてよいか」を自動判定するPoC（概念実証）です。
+
+**3つのことを実証します：**
+
+| | 機能 | 内容 |
+|--|------|------|
+| ① | **止める** | 問題のある荷物を止め、上流の問題が下流に波及しないようにする |
+| ② | **残す** | 「なぜ通したか」をルールセットダイジェストとともに記録する |
+| ③ | **辿る** | 問題が起きたとき、どこで何が起きたかを正確に特定する |
+
+---
+
+## 判定の種類
+
+引き渡し1回ごとに以下のいずれかの判定が出ます：
+
+| 判定 | 意味 | 対応 |
+|------|------|------|
+| ✅ **RELEASE** | 証拠完備・全指標がプロファイル内 | 次の区間へ進む |
+| 🟡 **HOLD** | 証拠不足（記録欠落 / シール破損） | 隔離して調査 |
+| 🟠 **QA_REVIEW** | 温度逸脱がグレーゾーン（alpha < 指標 ≤ beta） | QAレビュー後に判断 |
+| 🔴 **REJECT** | 重大違反 — 指標がbeta閾値を超過 | 廃棄・配送禁止 |
+
+RELEASE以外の判定が出た時点で**チェーンはデフォルトで停止**します。
+後続の区間は「整合性が保証できない」として評価されません。
+
+---
+
+## 実際に動かしてみる
+
+Python 3.8以上。外部ライブラリ不要。
+
+### ① まず組み込みデモを動かす（ファイル不要）
 
 ```bash
-# Built-in 3-scenario demo (no JSON file needed)
 python poc_handoff_pde.py
+```
 
-# Single-file evaluation
-python poc_handoff_pde.py sample_beta_breach_reject.json
+3つのシナリオ（正常・証拠欠落・温度逸脱）が一度に確認できます。
 
-# Multi-leg chain — stops at first non-RELEASE (default)
-python poc_handoff_pde.py --chain sample_chain_stop_demo.json
+---
 
-# Multi-leg chain — evaluate all legs
-python poc_handoff_pde.py --chain sample_chain_stop_demo.json --continue-after-fail
+### ② 具体的なケースで確認する
 
-# Write Markdown summary report
-python poc_handoff_pde.py --chain sample_chain_stop_demo.json --write-summary
+**ケースA：輸送中に温度が致命的水準を超えた → REJECT**
 
-# Invalid input examples (INPUT ERROR displayed, exit 1)
-python poc_handoff_pde.py sample_invalid_empty_temps.json
-python poc_handoff_pde.py sample_invalid_negatives.json
+輸送中に +11.5°C まで上昇（上限 +8°C）。書類・シールは正常でも廃棄判定になります。
 
-# Run tests (pytest required)
+```bash
+python poc_handoff_pde.py samples/sample_beta_breach_reject.json
+```
+
+**ケースB：3回の引き渡しのうち2回目でシール破損 → HOLD + チェーン停止**
+
+2回目で保留が出た時点で、3回目の評価は自動停止します。
+
+```bash
+python poc_handoff_pde.py --chain samples/sample_chain_stop_demo.json
+```
+
+`--continue-after-fail` を付けると、停止せず全区間を評価します（監査用）：
+
+```bash
+python poc_handoff_pde.py --chain samples/sample_chain_stop_demo.json --continue-after-fail
+```
+
+---
+
+### ③ 不正入力がどう弾かれるか確認する
+
+```bash
+# temperatures=[] なのに temp_missing=false → INPUT ERROR
+python poc_handoff_pde.py samples/sample_invalid_empty_temps.json
+
+# duration_minutes=-10 → INPUT ERROR
+python poc_handoff_pde.py samples/sample_invalid_negatives.json
+```
+
+`INPUT ERROR` は品質判定ではなく、**入力データ自体が不正**という意味です。
+上流のデータを修正する必要があります。
+
+---
+
+### ④ Markdownサマリーを出力する
+
+```bash
+python poc_handoff_pde.py --chain samples/sample_chain_stop_demo.json --write-summary
+```
+
+`docs/summary.md` に調査アンカー（最後の正常区間 / 最初の問題区間）を含むレポートが出力されます。
+
+---
+
+### ⑤ テストを実行する
+
+```bash
+pip install pytest
 pytest test_poc_handoff_pde.py -v
 ```
 
 ---
 
-## Files
+## 判定の流れ
 
 ```
-poc_handoff_pde.py              Main implementation (single file, no dependencies)
-README.md                       This file
-UPGRADE_TO_REAL_DATA.md         Step-by-step guide to connecting real data
-SECURITY_DESIGN.md              Input protection and known boundaries
-RED_TEAM_REPORT.md              Red-team-style scenario testing report (30 scenarios)
-
-sample_beta_breach_reject.json  Verdict demo: REJECT (d_plus > beta)
-sample_chain_stop_demo.json     Verdict demo: HOLD → chain stop (3 legs)
-sample_invalid_empty_temps.json Invalid input: temperatures=[] with temp_missing=false
-sample_invalid_negatives.json   Invalid input: duration_minutes < 0
-sample_invalid_timestamps.json  Invalid input: unsorted timestamps
-sample_invalid_evidence.json    Edge case: evidence_ok=false, all sub-flags true → WARN + HOLD
-
-test_poc_handoff_pde.py         Test suite (pytest)
-summary.md                      Example summary report output
+入力受付
+  │
+  ├─ validate_handoff_input() ── 不正形式？ ──→ INPUT ERROR（exit 1、判定なし）
+  │
+  ↓ 正常入力
+  ├─ 1. 証拠ゲート ─── 記録欠落 / シール破損？ ──→ HOLD
+  ├─ 2. 致命ゲート ─── 指標 > beta？            ──→ REJECT
+  ├─ 3. 自動承認 ───── 全指標 ≤ alpha？         ──→ RELEASE
+  └─ 4. グレーゾーン ─ alpha < 指標 ≤ beta      ──→ QA_REVIEW
 ```
 
-**Two placement layouts are supported:**
-
-```
-# Flat layout (ZIP default — test file alongside main script)
-project/
-  poc_handoff_pde.py
-  test_poc_handoff_pde.py    ← run: pytest test_poc_handoff_pde.py -v
-  sample_*.json ...
-
-# Subdirectory layout
-project/
-  poc_handoff_pde.py
-  tests/
-    test_poc_handoff_pde.py  ← run: pytest tests/test_poc_handoff_pde.py -v
-```
+判定順序は固定されており、監査可能です。
+ルールセットダイジェストにより、各判定は使用したプロファイルの正確なバージョンに紐付けられます。
 
 ---
 
-## Judgement logic
+## 各引き渡しで確認される証拠4項目
 
-```
-Input received
-  │
-  ├─ validate_handoff_input() ──── malformed? ──→ INPUT ERROR (exit 1, no verdict)
-  │
-  ↓ valid input
-  ├─ 1. Evidence gate ─── missing records / broken seal? ──→ HOLD
-  ├─ 2. Fatal gate ────── any metric > beta?              ──→ REJECT
-  ├─ 3. Auto-release ──── all metrics ≤ alpha?            ──→ RELEASE
-  └─ 4. Gray zone ─────── alpha < any metric ≤ beta       ──→ QA_REVIEW
-```
+一つでも確認できなければ、温度が正常でも HOLD になります：
 
-Decision order is fixed and auditable. The ruleset digest binds each verdict
-to the exact profile version used.
-
-**Important distinction:**
-- `HOLD` / `REJECT` / `QA_REVIEW` — valid input, quality verdict
-- `INPUT ERROR` — malformed input, not a quality verdict; fix the data upstream
+| 項目 | 内容 |
+|------|------|
+| 🔒 シールの完全性 | 改ざん防止シールが破損していないこと |
+| 📋 受け渡し記録の完備 | 誰から誰へ・いつ渡ったかの記録が揃っていること |
+| 🌡 温度ロガーの校正記録 | 使用したロガーが正しく校正されている証明があること |
+| 📊 温度記録の完備 | 輸送中の温度データが欠けていないこと |
 
 ---
 
-## Profile thresholds (PoC starter — 2–8°C)
+## プロファイル閾値（PoC スターター — 2〜8°C）
 
-| Metric | Alpha (auto-release ≤) | Beta (fatal >) |
-|--------|----------------------|----------------|
+| 指標 | Alpha（自動承認 ≤） | Beta（致命的 >） |
+|------|-------------------|----------------|
 | d_plus [°C] | 0.3 | 2.0 |
 | d_minus [°C] | 0.3 | 2.0 |
 | a_plus [°C·min] | 3.0 | 30.0 |
@@ -131,118 +153,126 @@ to the exact profile version used.
 | gap [min] | 10 | 45 |
 | duration [min] | 30 | 90 |
 
-**Comparison rule (single source of truth in `_exceeds()`):**
-- `observed > threshold` → breach / not-auto-release
-- `observed == threshold` → borderline stays in zone (not a breach)
-
-**Note on floating-point precision:** Beta thresholds (2.0, 30.0, 90.0) are exactly
-representable in IEEE-754 and comparisons are stable. The alpha d_plus threshold (0.3°C)
-is not exactly representable. Measurements very close to 0.3°C may land on either side
-depending on sensor rounding. Production deployments should apply appropriate measurement
-margins. See `SECURITY_DESIGN.md` §Known Boundaries.
+比較ルール：`観測値 > 閾値` → 違反。`観測値 == 閾値` → 違反ではない（境界はゾーン内に留まる）。
 
 ---
 
-## Input format
+## 入力フォーマット
 
 ```json
 {
-  "scenario_name": "optional label",
+  "scenario_name": "任意のラベル",
   "handoffs": [
     {
-      "shipment_id":                "SHIP-001",
-      "measure_id":                 "lifescience.coldchain.handoff.2to8c.v1",
-      "duration_minutes":           20.0,
-      "temperatures":               [[0, 5.0], [10, 5.3], [20, 5.1]],
-      "temp_missing":               false,
+      "shipment_id":                 "SHIP-001",
+      "measure_id":                  "lifescience.coldchain.handoff.2to8c.v1",
+      "duration_minutes":            20.0,
+      "temperatures":                [[0, 5.0], [10, 5.3], [20, 5.1]],
+      "temp_missing":                false,
       "max_temp_sample_gap_minutes": 10.0,
-      "handoff_from":               "Shipper-A",
-      "handoff_to":                 "Carrier-X",
-      "evidence_ok":                true,
-      "custody_complete":           true,
-      "seal_intact":                true,
-      "logger_calibrated":          true,
-      "temp_records_complete":      true
+      "handoff_from":                "出荷元-A",
+      "handoff_to":                  "輸送業者-X",
+      "evidence_ok":                 true,
+      "custody_complete":            true,
+      "seal_intact":                 true,
+      "logger_calibrated":           true,
+      "temp_records_complete":       true
     }
   ]
 }
 ```
 
-**Field rules:**
-- All bool fields must be JSON `true` / `false` — strings (`"false"`) and numbers (`0`/`1`) are rejected
-- All numeric fields must be finite — `NaN` and `Infinity` are rejected
-- `temperatures` timestamps must be strictly increasing (no duplicates, no reversal)
-- `temp_missing=true` requires `temp_records_complete=false` and `temperatures=[]`
-- `measure_id` must exactly equal `"lifescience.coldchain.handoff.2to8c.v1"`
+**主なフィールドルール：**
+- boolフィールドは `true` / `false` のみ（文字列 `"false"` や数値 `0` は拒否）
+- 数値フィールドは有限値のみ（`NaN`・`Infinity` は拒否）
+- `temperatures` のタイムスタンプは厳密昇順（重複・逆順は拒否）
+- `measure_id` は `"lifescience.coldchain.handoff.2to8c.v1"` と完全一致必須
 
-**When temperature data is absent for a leg:**
+温度データが欠落している区間の場合：
+
 ```json
 "temperatures": [],
 "temp_missing": true,
 "temp_records_complete": false
 ```
 
-**Optional fields** (may be omitted):
-- `handoff_from`, `handoff_to` — leg endpoints (shown in output; null/absent allowed)
-- `pallet_id`, `logger_id` — tracking identifiers (stored, not evaluated)
+---
 
-See `UPGRADE_TO_REAL_DATA.md` for the complete field specification with types,
-constraints, and sample JSONs (valid / missing-field / type-error).
+## サンプルと期待される結果
+
+| ファイル | 期待される結果 | シナリオ |
+|---------|--------------|---------|
+| `samples/sample_beta_breach_reject.json` | 🔴 REJECT | 温度が +11.5°C → d_plus = 3.5 > beta(2.0) |
+| `samples/sample_chain_stop_demo.json`（デフォルト） | 🟡 区間2でHOLD、区間3はスキップ | 中継でシール破損 |
+| `samples/sample_chain_stop_demo.json --continue-after-fail` | HOLD + RELEASE | 全区間評価（監査用） |
+| `samples/sample_invalid_empty_temps.json` | INPUT ERROR、exit 1 | `temperatures=[]` かつ `temp_missing=false` |
+| `samples/sample_invalid_negatives.json` | INPUT ERROR、exit 1 | `duration_minutes=-10` |
+| `samples/sample_invalid_timestamps.json` | INPUT ERROR、exit 1 | タイムスタンプ逆順 |
+| `samples/sample_invalid_evidence.json` | stderrに警告 + 🟡 HOLD | `evidence_ok=false` かつ全サブフラグ true |
 
 ---
 
-## Samples and expected outcomes
+## ADIC Phase 1 証明書
 
-| File | Expected outcome | Scenario |
-|------|-----------------|----------|
-| `sample_beta_breach_reject.json` | 🔴 REJECT | d_plus = 3.5 > beta (2.0) |
-| `sample_chain_stop_demo.json` (default) | 🟡 HOLD at leg 2, leg 3 skipped | Seal broken mid-chain |
-| `sample_chain_stop_demo.json --continue-after-fail` | HOLD + RELEASE | All legs evaluated |
-| `sample_invalid_empty_temps.json` | INPUT ERROR, exit 1 | `temperatures=[]` with `temp_missing=false` |
-| `sample_invalid_negatives.json` | INPUT ERROR, exit 1 | `duration_minutes=-10` |
-| `sample_invalid_timestamps.json` | INPUT ERROR, exit 1 | Unsorted timestamps |
-| `sample_invalid_evidence.json` | WARN to stderr + 🟡 HOLD | `evidence_ok=false` but all sub-flags true |
+`ADIC_POC_PHASE1_CERTIFICATE.py` はこのリポジトリの証明書兼検証スクリプトです。
+対象ファイルのSHA-256ハッシュ・プロファイルダイジェスト・リプレイ結果を記録し、
+実行時に一致を検証します。push のたびに GitHub Actions で自動検証されます（`.github/workflows/adic-verify.yml`）。
 
-The built-in demo (`python poc_handoff_pde.py` with no arguments) runs three scenarios
-from code-embedded data — no JSON file required.
+```bash
+# 証明書を検証する
+python ADIC_POC_PHASE1_CERTIFICATE.py
 
----
-
-## Red-Team-Style Scenario Testing
-
-This PoC includes red-team-style scenario testing for input tampering and integrity failures.
-This is not a claim of production-grade penetration testing, cryptographic security audit,
-or regulatory certification.
-
-The current scope focuses on PoC-level validation of tampering and integrity scenarios,
-specifically the validation boundary at the parsed JSON dict layer.
+# 証明書の内容をJSON形式で表示する
+python ADIC_POC_PHASE1_CERTIFICATE.py --show
+```
 
 ---
 
-### At a glance
+## ファイル構成
 
-- 30 scenarios documented
-- 25 scenarios covered by tests
-- 18 blocked before evaluation
-- 2 HOLD
-- 3 REJECT
-- 2 QA_REVIEW
-- 1 Known Gap
-- 4 Out of Scope
+```
+poc_handoff_pde.py                   メイン実装（単一ファイル、依存なし）
+test_poc_handoff_pde.py              テストスイート（pytest）
+ADIC_POC_PHASE1_CERTIFICATE.py       ADIC Phase 1 証明書 兼 検証スクリプト
+README.md                            このファイル
 
-Most malformed or type-coercion attacks are blocked before evaluation.
-Contradictory evidence produces HOLD rather than bypass.
-A downstream clean leg cannot mask an upstream failure.
-Fabricated but structurally valid data remains a Known Gap.
+docs/
+  UPGRADE_TO_REAL_DATA.md            実データ接続のステップバイステップガイド
+  SECURITY_DESIGN.md                 入力保護と既知の境界値
+  RED_TEAM_REPORT.md                 レッドチーム形式シナリオテストレポート（30シナリオ）
+  summary.md                         サマリーレポートの出力例
 
-See `RED_TEAM_REPORT.md` for full details and `SECURITY_DESIGN.md` for boundary notes.
+samples/
+  sample_beta_breach_reject.json     判定デモ: REJECT（温度 > beta）
+  sample_chain_stop_demo.json        判定デモ: HOLD → チェーン停止（3区間）
+  sample_invalid_empty_temps.json    不正入力: temp_missing=false なのに temperatures=[]
+  sample_invalid_negatives.json      不正入力: duration_minutes < 0
+  sample_invalid_timestamps.json     不正入力: タイムスタンプが非昇順
+  sample_invalid_evidence.json       エッジケース: evidence_ok=false かつ全サブフラグ true
+
+.github/workflows/
+  adic-verify.yml                    GitHub Actions 自動検証ワークフロー
+```
 
 ---
 
-## What this PoC does NOT claim
+## レッドチーム形式シナリオテスト
 
-- **Regulatory compliance** — thresholds must be validated per-product and per-lane
-- **Attribution** — responsibility assignment is out of scope
-- **Real-time operation** — this evaluates recorded data, not live sensor streams
-- **Production readiness** — see `UPGRADE_TO_REAL_DATA.md` for the graduation checklist
-- **Production-grade penetration testing** — the red-team-style scenario testing above covers the PoC's input validation boundary only
+不正入力・改ざん・型強制攻撃への耐性を30シナリオで検証しています。
+
+- **30シナリオをドキュメント化**、うち25シナリオをテストでカバー
+- 不正形式・型強制のほとんどは**評価前にブロック**
+- 矛盾した証拠は**バイパスではなくHOLD**になる
+- 下流の正常区間が**上流の問題を隠蔽することはできない**
+
+詳細は `docs/RED_TEAM_REPORT.md`、境界値の注記は `docs/SECURITY_DESIGN.md` を参照してください。
+
+---
+
+## このPoCが主張しないこと
+
+- **規制準拠** — 閾値は製品ごと・輸送ルートごとに検証が必要
+- **責任帰属** — 誰の責任かの判定は対象外
+- **リアルタイム処理** — ライブセンサーではなく、記録済みデータを評価するもの
+- **本番環境対応** — 移行チェックリストは `docs/UPGRADE_TO_REAL_DATA.md` を参照
+- **本番グレードのペネトレーションテスト** — PoC の入力検証境界のみをカバー
