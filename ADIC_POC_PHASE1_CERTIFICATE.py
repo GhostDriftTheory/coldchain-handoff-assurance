@@ -29,17 +29,17 @@ ADIC_TARGET_FILES = [
     {
         "path": "poc_handoff_pde.py",
         "role": "judgement_logic",
-        "sha256": "dc16ec71654ea12da79b15c52b3d4a8c33abaddf186825382f769354d7e8532d",
-        "size_bytes": 39940,
+        "sha256": "4fc65615fd383d3491f4ad931da90b77e49188709a03e3d46195cebc4569919f",
+        "size_bytes": 39922,
     },
     {
-        "path": "sample_beta_breach_reject.json",
+        "path": "samples/sample_beta_breach_reject.json",
         "role": "replay_input_reject",
         "sha256": "9773e8a605217ec9c2bda7adba4112734cd85124121bf43277ad9cfd93951fd8",
         "size_bytes": 1049,
     },
     {
-        "path": "sample_chain_stop_demo.json",
+        "path": "samples/sample_chain_stop_demo.json",
         "role": "replay_input_chain_stop",
         "sha256": "832e51d19db91dc38b34ef8c9283b32ed46aeaac1b409556e5b281e3a87c66a8",
         "size_bytes": 2883,
@@ -51,7 +51,7 @@ ADIC_TARGET_FILES = [
         "size_bytes": 39240,
     },
     {
-        "path": "SECURITY_DESIGN.md",
+        "path": "docs/SECURITY_DESIGN.md",
         "role": "security_scope",
         "sha256": "2293a521c3edef60f98081751c4e4e980c48c89186ea1b54a9c97f09c9154d14",
         "size_bytes": 8245,
@@ -129,7 +129,7 @@ CERTIFICATE = {
         "No completed OnzaLinks integration claim.",
     ],
     "expected_replay": {
-        "sample_beta_breach_reject.json": {
+        "samples/sample_beta_breach_reject.json": {
             "labels": ["REJECT"],
             "stopped_early": False,
             "total_legs": 1,
@@ -139,7 +139,7 @@ CERTIFICATE = {
                 "7f6316887758c1a358904854d215f13765c276df8f3d1852dfce6664203d053c",
             ],
         },
-        "sample_chain_stop_demo.json": {
+        "samples/sample_chain_stop_demo.json": {
             "labels": ["RELEASE", "HOLD"],
             "stopped_early": True,
             "total_legs": 3,
@@ -258,8 +258,8 @@ def verify(project_dir: Path) -> None:
     verify_artifacts(project_dir)
     poc = load_poc(project_dir)
     verify_profile(poc)
-    verify_replay(project_dir, poc, "sample_beta_breach_reject.json")
-    verify_replay(project_dir, poc, "sample_chain_stop_demo.json")
+    verify_replay(project_dir, poc, "samples/sample_beta_breach_reject.json")
+    verify_replay(project_dir, poc, "samples/sample_chain_stop_demo.json")
 
 
 def main() -> None:
