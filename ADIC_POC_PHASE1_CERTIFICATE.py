@@ -35,14 +35,14 @@ ADIC_TARGET_FILES = [
     {
         "path": "samples/sample_beta_breach_reject.json",
         "role": "replay_input_reject",
-        "sha256": "9773e8a605217ec9c2bda7adba4112734cd85124121bf43277ad9cfd93951fd8",
-        "size_bytes": 1049,
+        "sha256": "553d0336b28fb6cd9c23ee037246ecd5d9454d811b789f3a29a1844bfbc1e1d9",
+        "size_bytes": 1050,
     },
     {
         "path": "samples/sample_chain_stop_demo.json",
         "role": "replay_input_chain_stop",
-        "sha256": "832e51d19db91dc38b34ef8c9283b32ed46aeaac1b409556e5b281e3a87c66a8",
-        "size_bytes": 2883,
+        "sha256": "4cd7baba5ab5e3e87ce5cf97df322f3ea3f1a071b038aa48988845738df58264",
+        "size_bytes": 2884,
     },
     {
         "path": "test_poc_handoff_pde.py",
