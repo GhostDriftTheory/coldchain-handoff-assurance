@@ -616,29 +616,29 @@ class TestCLIFormat:
         return result.returncode, result.stdout, result.stderr
 
     def test_invalid_empty_temps_exits_1(self):
-        rc, _, _ = self._cli("sample_invalid_empty_temps.json")
+        rc, _, _ = self._cli("samples/sample_invalid_empty_temps.json")
         assert rc == 1
 
     def test_invalid_empty_temps_shows_input_error(self):
-        _, _, err = self._cli("sample_invalid_empty_temps.json")
+        _, _, err = self._cli("samples/sample_invalid_empty_temps.json")
         assert "INPUT ERROR:" in err
 
     def test_invalid_empty_temps_no_traceback(self):
-        _, _, err = self._cli("sample_invalid_empty_temps.json")
+        _, _, err = self._cli("samples/sample_invalid_empty_temps.json")
         assert "Traceback" not in err
         assert 'File "' not in err
 
     def test_invalid_negatives_shows_input_error(self):
-        rc, _, err = self._cli("sample_invalid_negatives.json")
+        rc, _, err = self._cli("samples/sample_invalid_negatives.json")
         assert rc == 1 and "INPUT ERROR:" in err and "Traceback" not in err
 
     def test_invalid_timestamps_shows_input_error(self):
-        rc, _, err = self._cli("sample_invalid_timestamps.json")
+        rc, _, err = self._cli("samples/sample_invalid_timestamps.json")
         assert rc == 1 and "INPUT ERROR:" in err and "Traceback" not in err
 
     def test_valid_json_exits_0(self):
         # sample_beta_breach_reject.json is valid input (REJECT verdict, clean exit)
-        rc, _, err = self._cli("sample_beta_breach_reject.json")
+        rc, _, err = self._cli("samples/sample_beta_breach_reject.json")
         assert rc == 0, f"expected exit 0, got {rc}\nstderr: {err}"
 
 
