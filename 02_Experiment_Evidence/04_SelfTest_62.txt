@@ -1,0 +1,90 @@
+﻿py : test_01_existing_adic_certificate (__main__.self_test.<locals>.Tests.test_01_existing_adic_certificate) ... ok
+発生場所 行:2 文字:5
++     py $script self-test 2>&1 | Out-File (Join-Path $private "04_Self ...
++     ~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (test_01_existin...ificate) ... ok:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+test_02_independent_expected_labels (__main__.self_test.<locals>.Tests.test_02_independent_expected_labels) ... ok
+test_03_boundaries (__main__.self_test.<locals>.Tests.test_03_boundaries) ... ok
+test_04_four_actions_all_cases (__main__.self_test.<locals>.Tests.test_04_four_actions_all_cases) ... ok
+test_05_each_missing_required_field (__main__.self_test.<locals>.Tests.test_05_each_missing_required_field) ... ok
+test_06_bool_field_types (__main__.self_test.<locals>.Tests.test_06_bool_field_types) ... ok
+test_07_numeric_types (__main__.self_test.<locals>.Tests.test_07_numeric_types) ... ok
+test_08_timestamp_coverage (__main__.self_test.<locals>.Tests.test_08_timestamp_coverage) ... ok
+test_09_gap_is_not_a_model_claim (__main__.self_test.<locals>.Tests.test_09_gap_is_not_a_model_claim) ... ok
+test_10_missing_explicitly_remains_hold (__main__.self_test.<locals>.Tests.test_10_missing_explicitly_remains_hold) ...
+ ok
+test_11_chain_identifiers (__main__.self_test.<locals>.Tests.test_11_chain_identifiers) ... ok
+test_12_proposal_never_mutates_host_data (__main__.self_test.<locals>.Tests.test_12_proposal_never_mutates_host_data) .
+.. ok
+test_13_actual_simulated_sink_invocation (__main__.self_test.<locals>.Tests.test_13_actual_simulated_sink_invocation) .
+.. ok
+test_14_revalidation_before_execution (__main__.self_test.<locals>.Tests.test_14_revalidation_before_execution) ... ok
+test_15_strict_json_duplicates_and_constants (__main__.self_test.<locals>.Tests.test_15_strict_json_duplicates_and_cons
+tants) ... ok
+test_16_response_array_not_sdk_shortcut (__main__.self_test.<locals>.Tests.test_16_response_array_not_sdk_shortcut) ...
+ ok
+test_17_refusal (__main__.self_test.<locals>.Tests.test_17_refusal) ... ok
+test_18_incomplete_not_success (__main__.self_test.<locals>.Tests.test_18_incomplete_not_success) ... ok
+test_19_ambiguous_or_unexpected_outputs (__main__.self_test.<locals>.Tests.test_19_ambiguous_or_unexpected_outputs) ...
+ ok
+test_20_output_json_error (__main__.self_test.<locals>.Tests.test_20_output_json_error) ... ok
+test_21_request_has_no_answer_or_secret (__main__.self_test.<locals>.Tests.test_21_request_has_no_answer_or_secret) ...
+ ok
+test_22_zero_denominator_is_na (__main__.self_test.<locals>.Tests.test_22_zero_denominator_is_na) ... ok
+test_23_model_conservatism_not_gate_false_block (__main__.self_test.<locals>.Tests.test_23_model_conservatism_not_gate_
+false_block) ... ok
+test_24_transport_failure_not_policy_prevention (__main__.self_test.<locals>.Tests.test_24_transport_failure_not_policy
+_prevention) ... ok
+test_25_bad_binding_not_policy_prevention (__main__.self_test.<locals>.Tests.test_25_bad_binding_not_policy_prevention)
+ ... ok
+test_26_demo_replay (__main__.self_test.<locals>.Tests.test_26_demo_replay) ... ok
+test_27_mock_http_envelope_replay (__main__.self_test.<locals>.Tests.test_27_mock_http_envelope_replay) ... ok
+test_28_simple_tamper (__main__.self_test.<locals>.Tests.test_28_simple_tamper) ... ok
+test_29_rehashed_decision_tamper (__main__.self_test.<locals>.Tests.test_29_rehashed_decision_tamper) ... ok
+test_30_rehashed_trial_deletion (__main__.self_test.<locals>.Tests.test_30_rehashed_trial_deletion) ... ok
+test_31_rehashed_response_mismatch (__main__.self_test.<locals>.Tests.test_31_rehashed_response_mismatch) ... ok
+test_32_rehashed_suite_tamper (__main__.self_test.<locals>.Tests.test_32_rehashed_suite_tamper) ... ok
+test_33_rehashed_request_tamper (__main__.self_test.<locals>.Tests.test_33_rehashed_request_tamper) ... ok
+test_34_rehashed_origin_mix (__main__.self_test.<locals>.Tests.test_34_rehashed_origin_mix) ... ok
+test_35_partial_run_explicit (__main__.self_test.<locals>.Tests.test_35_partial_run_explicit) ... ok
+test_36_boolean_metric_tamper (__main__.self_test.<locals>.Tests.test_36_boolean_metric_tamper) ... ok
+test_37_usage_including_reasoning (__main__.self_test.<locals>.Tests.test_37_usage_including_reasoning) ... ok
+test_38_missing_usage_not_zero_claim (__main__.self_test.<locals>.Tests.test_38_missing_usage_not_zero_claim) ... ok
+test_39_negative_control (__main__.self_test.<locals>.Tests.test_39_negative_control) ... ok
+test_40_new_directory_only (__main__.self_test.<locals>.Tests.test_40_new_directory_only) ... ok
+test_41_atomic_save_and_utf8 (__main__.self_test.<locals>.Tests.test_41_atomic_save_and_utf8) ... ok
+test_42_report_separates_demo (__main__.self_test.<locals>.Tests.test_42_report_separates_demo) ... ok
+test_43_report_escapes_markup (__main__.self_test.<locals>.Tests.test_43_report_escapes_markup) ... ok
+test_44_live_requires_optin_before_network (__main__.self_test.<locals>.Tests.test_44_live_requires_optin_before_networ
+k) ... ok
+test_45_limit_checked_before_key (__main__.self_test.<locals>.Tests.test_45_limit_checked_before_key) ... ok
+test_46_no_http_redirects (__main__.self_test.<locals>.Tests.test_46_no_http_redirects) ... ok
+test_47_partial_status_no_release (__main__.self_test.<locals>.Tests.test_47_partial_status_no_release) ... ok
+test_48_all_record_metrics_replay (__main__.self_test.<locals>.Tests.test_48_all_record_metrics_replay) ... ok
+test_49_response_identity_required (__main__.self_test.<locals>.Tests.test_49_response_identity_required) ... ok
+test_50_huge_number_is_not_accepted (__main__.self_test.<locals>.Tests.test_50_huge_number_is_not_accepted) ... ok
+test_51_rehashed_invalid_config (__main__.self_test.<locals>.Tests.test_51_rehashed_invalid_config) ... ok
+test_52_rehashed_http_status_tamper (__main__.self_test.<locals>.Tests.test_52_rehashed_http_status_tamper) ... ok
+test_53_rehashed_summary_tamper (__main__.self_test.<locals>.Tests.test_53_rehashed_summary_tamper) ... ok
+test_54_real_transport_assembly_with_mock_socket (__main__.self_test.<locals>.Tests.test_54_real_transport_assembly_wit
+h_mock_socket) ... ok
+test_55_http_error_never_retried_or_body_logged (__main__.self_test.<locals>.Tests.test_55_http_error_never_retried_or_
+body_logged) ... ok
+test_56_timeout_no_retry (__main__.self_test.<locals>.Tests.test_56_timeout_no_retry) ... ok
+test_57_bad_http_json_and_oversize (__main__.self_test.<locals>.Tests.test_57_bad_http_json_and_oversize) ... ok
+test_58_secret_echo_is_never_saved (__main__.self_test.<locals>.Tests.test_58_secret_echo_is_never_saved) ... ok
+test_59_mocked_live_end_to_end (__main__.self_test.<locals>.Tests.test_59_mocked_live_end_to_end) ... ok
+test_60_mocked_api_error_stops_and_replays (__main__.self_test.<locals>.Tests.test_60_mocked_api_error_stops_and_replay
+s) ... ok
+test_61_mocked_interruption_preserves_inflight_trial (__main__.self_test.<locals>.Tests.test_61_mocked_interruption_pre
+serves_inflight_trial) ... ok
+test_62_mocked_all_incomplete_not_a_safety_success (__main__.self_test.<locals>.Tests.test_62_mocked_all_incomplete_not
+_a_safety_success) ... ok
+
+----------------------------------------------------------------------
+Ran 62 tests in 1.795s
+
+OK
+Self-tests use ONLY local fixtures and mocked API envelopes; no live OpenAI call.
